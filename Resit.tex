@@ -1,0 +1,154 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[right=1in, left=1in, top=2.5in, bottom=1in]{geometry}
+\usepackage{array}
+\usepackage{amsmath}
+\usepackage{caption}
+\usepackage{graphicx}
+\usepackage{ragged2e}
+\usepackage{tcolorbox}
+%\usepackage{background}
+\usepackage{csvsimple}
+\usepackage{ifthen}
+\usepackage{eso-pic}
+
+\newcommand{\maybeincludegraphics}[2][]{%
+  \IfFileExists{#2}{\includegraphics[#1]{#2}}{}%
+}
+\usepackage{etoolbox} 
+
+% Ensure special characters (like &) are treated safely
+\csvset{respect all=true, before reading=\catcode`\&=12}
+
+% Define Serial Number Counter
+\newcounter{serialNo}
+\setcounter{serialNo}{0}
+
+% Define Course Number Counter
+\newcounter{courseNo}
+\providecommand{\gradeOne}{}
+\providecommand{\codeOne}{}
+\providecommand{\subOne}{}
+\providecommand{\gradeTwo}{}
+\providecommand{\codeTwo}{}
+\providecommand{\subTwo}{}
+\providecommand{\gradeThree}{}
+\providecommand{\codeThree}{}
+\providecommand{\subThree}{}
+\providecommand{\gradeFour}{}
+\providecommand{\codeFour}{}
+\providecommand{\subFour}{}
+\providecommand{\gradeFive}{}
+\providecommand{\codeFive}{}
+\providecommand{\subFive}{}
+\providecommand{\gradeSix}{}
+\providecommand{\codeSix}{}
+\providecommand{\subSix}{}
+\providecommand{\gradeSeven}{}
+\providecommand{\codeSeven}{}
+\providecommand{\subSeven}{}
+\providecommand{\gradeEight}{}
+\providecommand{\codeEight}{}
+\providecommand{\subEight}{}
+\providecommand{\gradeNine}{}
+\providecommand{\codeNine}{}
+\providecommand{\subNine}{}
+\providecommand{\gradeTen}{}
+\providecommand{\codeTen}{}
+\providecommand{\subTen}{}
+\providecommand{\gradeEleven}{}
+\providecommand{\codeEleven}{}
+\providecommand{\subEleven}{}
+\hfuzz=30pt
+\hbadness=10000
+
+\begin{document}
+\pagenumbering{gobble} % Disable page numbers
+
+\csvreader[
+  head to column names]{Ex_1st_sem_MTST24_S2026.csv}{}{%
+  \ifthenelse{\equal{\roll}{}}{}{%
+  % ---------- Background ----------
+  \AddToShipoutPicture*{
+    \put(0,0){
+      \maybeincludegraphics[width=\paperwidth,height=\paperheight]{Admit_card_background.png}
+    }
+  }
+
+  \stepcounter{serialNo}
+
+    \flushright\textbf{Serial No: 00\theserialNo}\\
+    \begin{center}
+      \textbf{\Large ADMISSION CARD}\\
+      ACADEMIC YEAR \session\\
+    \end{center}
+
+  \begin{flushright}
+    \tcbox[colframe=black,colback=white,boxrule=0.5mm,arc=3mm,
+    width=0.8\textwidth, height=3cm, halign=flush left]{
+      \begin{minipage}{0.15\textwidth}
+      \centering
+      \small Paste Passport\\
+      size photo\\
+      (compulsory)
+      \end{minipage}
+    }
+  \end{flushright}
+
+  \vspace{0.5cm}
+  % ---------- Student Info ----------
+\noindent
+\begin{tabular}{lclp{0.5cm}lcl}
+\textbf{Student's Name} &: & \multicolumn{5}{l}{\name} \\
+\textbf{Exam Roll No.} &: & \roll & & \textbf{Gender} &: & \Gender \\
+\textbf{Programme} &: & \Programme & & \textbf{Examination} &: & \examination \\
+\textbf{Semester} &: & \Semester & & \textbf{Medium} &: & English \\
+\textbf{Mother's Name} &: & \mothername & & \textbf{Category} &: & \Category \\
+\end{tabular}
+
+  \vspace{0.5cm}
+  \centering
+  \renewcommand{\arraystretch}{1.2}
+  
+  % --- PREPARE TABLE CONTENT ---
+  \setcounter{courseNo}{0} % Used here to check if ANY courses are failed/absent
+  \def\tablebody{} % Clear the table body
+  
+  % Updated logic to check for Grade 'F' only
+  \ifthenelse{\equal{\gradeOne}{F}}{\stepcounter{courseNo}\appto\tablebody{\stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeOne & \subOne\\}}{}
+  \ifthenelse{\equal{\gradeTwo}{F}}{\stepcounter{courseNo}\appto\tablebody{\stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeTwo & \subTwo\\}}{}
+  \ifthenelse{\equal{\gradeThree}{F}}{\stepcounter{courseNo}\appto\tablebody{\stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeThree & \subThree\\}}{}
+  \ifthenelse{\equal{\gradeFour}{F}}{\stepcounter{courseNo}\appto\tablebody{\stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeFour & \subFour\\}}{}
+  \ifthenelse{\equal{\gradeFive}{F}}{\stepcounter{courseNo}\appto\tablebody{\stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeFive & \subFive\\}}{}
+  \ifthenelse{\equal{\gradeSix}{F}}{\stepcounter{courseNo}\appto\tablebody{\stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeSix & \subSix\\}}{}
+  \ifthenelse{\equal{\gradeSeven}{F}}{\stepcounter{courseNo}\appto\tablebody{\stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeSeven & \subSeven\\}}{}
+  \ifthenelse{\equal{\gradeEight}{F}}{\stepcounter{courseNo}\appto\tablebody{\stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeEight & \subEight\\}}{}
+  \ifthenelse{\equal{\gradeNine}{F}}{\stepcounter{courseNo}\appto\tablebody{\stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeNine & \subNine\\}}{}
+  \ifthenelse{\equal{\gradeTen}{F}}{\stepcounter{courseNo}\appto\tablebody{\stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeTen & \subTen\\}}{}
+  \ifthenelse{\equal{\gradeEleven}{F}}{\stepcounter{courseNo}\appto\tablebody{\stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeEleven & \subEleven\\}}{}
+  
+  % If no courses failed (courseNo is still 0), append the "No failed courses" row
+  \ifthenelse{\value{courseNo}=0}{\appto\tablebody{- & - & No failed subjects\\}}{}
+
+  % RESET counter BEFORE drawing the table so it counts 1, 2, 3... properly inside the table
+  \setcounter{courseNo}{0} 
+
+  % --- DRAW TABLE ---
+  \begin{tabular}{|>{\centering\arraybackslash}p{1cm}|>{\centering\arraybackslash}p{3.2cm}|p{11cm}|}
+    \hline
+    \textbf{S.No} & \textbf{Course Code} & \textbf{Course Name} \\
+    \hline
+    \tablebody
+    \hline
+  \end{tabular}
+
+  \vspace{1.5cm}
+  \begin{flushright}
+    \IfFileExists{signAND-removebg-preview.png}{\includegraphics[width=3cm]{signAND-removebg-preview.png}\\}{}
+    \small\textbf{Controller of Examination}\\
+  \end{flushright}
+  \clearpage
+  }% end non-empty roll check
+} % end csvreader
+
+\end{document}
