@@ -26,6 +26,18 @@
 
 % Define Course Number Counter
 \newcounter{courseNo}
+
+% Append one numbered row for a course slot to \tablebody when its grade is F or Z.
+% A course whose code is "--" (or empty) is skipped, even if its grade is F or Z.
+%   #1 = grade, #2 = course code, #3 = course name
+\newcommand{\addcourserow}[3]{%
+  \ifthenelse{\equal{#1}{F}\OR\equal{#1}{Z}}{%
+    \ifthenelse{\equal{#2}{--}\OR\equal{#2}{}}{}{%
+      \stepcounter{courseNo}%
+      \appto\tablebody{\stepcounter{courseNo}\thecourseNo{.}  & \justifying#2 & #3\\}%
+    }%
+  }{}%
+}
 \hfuzz=30pt
 \hbadness=10000
 
@@ -82,17 +94,17 @@
   \def\tablebody{} % Clear the table body
   
   % Updated logic to check for Grade 'F' OR Grade 'Z'
-  \ifthenelse{\equal{\gradeOne}{F} \OR \equal{\gradeOne}{Z}}{\stepcounter{courseNo}\appto\tablebody{\stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeOne & \subOne\\}}{}
-  \ifthenelse{\equal{\gradeTwo}{F} \OR \equal{\gradeTwo}{Z}}{\stepcounter{courseNo}\appto\tablebody{\stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeTwo & \subTwo\\}}{}
-  \ifthenelse{\equal{\gradeThree}{F} \OR \equal{\gradeThree}{Z}}{\stepcounter{courseNo}\appto\tablebody{\stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeThree & \subThree\\}}{}
-  \ifthenelse{\equal{\gradeFour}{F} \OR \equal{\gradeFour}{Z}}{\stepcounter{courseNo}\appto\tablebody{\stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeFour & \subFour\\}}{}
-  \ifthenelse{\equal{\gradeFive}{F} \OR \equal{\gradeFive}{Z}}{\stepcounter{courseNo}\appto\tablebody{\stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeFive & \subFive\\}}{}
-  \ifthenelse{\equal{\gradeSix}{F} \OR \equal{\gradeSix}{Z}}{\stepcounter{courseNo}\appto\tablebody{\stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeSix & \subSix\\}}{}
-  \ifthenelse{\equal{\gradeSeven}{F} \OR \equal{\gradeSeven}{Z}}{\stepcounter{courseNo}\appto\tablebody{\stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeSeven & \subSeven\\}}{}
-  \ifthenelse{\equal{\gradeEight}{F} \OR \equal{\gradeEight}{Z}}{\stepcounter{courseNo}\appto\tablebody{\stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeEight & \subEight\\}}{}
-  \ifthenelse{\equal{\gradeNine}{F} \OR \equal{\gradeNine}{Z}}{\stepcounter{courseNo}\appto\tablebody{\stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeNine & \subNine\\}}{}
-  \ifthenelse{\equal{\gradeTen}{F} \OR \equal{\gradeTen}{Z}}{\stepcounter{courseNo}\appto\tablebody{\stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeTen & \subTen\\}}{}
-  \ifthenelse{\equal{\gradeEleven}{F} \OR \equal{\gradeEleven}{Z}}{\stepcounter{courseNo}\appto\tablebody{\stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeEleven & \subEleven\\}}{}
+  \addcourserow{\gradeOne}{\codeOne}{\subOne}
+  \addcourserow{\gradeTwo}{\codeTwo}{\subTwo}
+  \addcourserow{\gradeThree}{\codeThree}{\subThree}
+  \addcourserow{\gradeFour}{\codeFour}{\subFour}
+  \addcourserow{\gradeFive}{\codeFive}{\subFive}
+  \addcourserow{\gradeSix}{\codeSix}{\subSix}
+  \addcourserow{\gradeSeven}{\codeSeven}{\subSeven}
+  \addcourserow{\gradeEight}{\codeEight}{\subEight}
+  \addcourserow{\gradeNine}{\codeNine}{\subNine}
+  \addcourserow{\gradeTen}{\codeTen}{\subTen}
+  \addcourserow{\gradeEleven}{\codeEleven}{\subEleven}
   
   % If no courses failed (courseNo is still 0), append the "No failed courses" row
   \ifthenelse{\value{courseNo}=0}{\appto\tablebody{- & - & No failed or absent subjects\\}}{}
