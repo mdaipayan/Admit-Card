@@ -9,15 +9,10 @@ The app reuses the existing LaTeX templates that live next to this file:
 plus the shared assets:
     Admit_card_background.png   signAND-removebg-preview.png
 
-Subject slots whose code is "--" in the CSV are removed before compiling, so
-they never appear on the admit card (remaining courses are shifted up).
-
 Requirement: a LaTeX distribution providing `pdflatex` must be installed and on
 PATH (MiKTeX or TeX Live). Run with:  streamlit run app.py
 """
 
-import csv
-import io
 import os
 import re
 import shutil
@@ -50,18 +45,6 @@ CSV_NAME = "data.csv"
 # regex that swaps the hard-coded CSV filename in  \csvreader[...]{FILE.csv}
 CSVREADER_RE = re.compile(r"(\\csvreader\[.*?\]\s*\{)[^}]*\}", re.DOTALL)
 
-# A course slot whose code equals this value means "no subject here" and is
-# dropped before the CSV is handed to LaTeX.
-EMPTY_SUBJECT_MARKER = "--"
-
-# Course slots are numbered One..Eleven; each slot has up to three columns
-# (code<Ordinal>, sub<Ordinal>, grade<Ordinal>).
-SLOT_ORDINALS = [
-    "One", "Two", "Three", "Four", "Five", "Six",
-    "Seven", "Eight", "Nine", "Ten", "Eleven",
-]
-SLOT_FIELDS = ["code", "sub", "grade"]
-
 
 # --------------------------------------------------------------------------- #
 # Helpers
@@ -69,76 +52,6 @@ SLOT_FIELDS = ["code", "sub", "grade"]
 def find_pdflatex() -> str | None:
     """Return the path to pdflatex, or None if it is not installed."""
     return shutil.which("pdflatex")
-
-
-def _decode_csv(csv_bytes: bytes) -> tuple[str, str]:
-    """Decode CSV bytes, returning (text, encoding_used). A UTF-8 BOM is stripped."""
-    for enc in ("utf-8-sig", "cp1252"):
-        try:
-            return csv_bytes.decode(enc), enc
-        except UnicodeDecodeError:
-            continue
-    return csv_bytes.decode("latin-1"), "latin-1"
-
-
-def drop_empty_subjects(csv_bytes: bytes) -> tuple[bytes, int]:
-    """
-    Remove every course whose subject code is "--" from each student row.
-
-    For each row the surviving courses are packed into the first slots in their
-    original order, and the freed trailing slots are blanked (code, sub and
-    grade together), so a "--" course can never reach the LaTeX template and no
-    gap is left between courses.
-
-    Returns (new_csv_bytes, number_of_slots_removed). If nothing needs removing
-    the original bytes are returned untouched.
-    """
-    text, enc = _decode_csv(csv_bytes)
-
-    first_line = next((ln for ln in text.splitlines() if ln.strip()), "")
-    delimiter = max(",;\t", key=first_line.count) if first_line else ","
-
-    rows = list(csv.reader(io.StringIO(text, newline=""), delimiter=delimiter))
-    if not rows:
-        return csv_bytes, 0
-
-    header = [h.strip() for h in rows[0]]
-
-    # slots: one {field: column_index} dict per course slot that has a code column
-    slots = []
-    for ordinal in SLOT_ORDINALS:
-        cols = {f: header.index(f + ordinal) for f in SLOT_FIELDS if (f + ordinal) in header}
-        if "code" in cols:
-            slots.append(cols)
-    if not slots:
-        return csv_bytes, 0
-
-    removed = 0
-    for r, row in enumerate(rows[1:], start=1):
-        if not row:  # blank line — leave as is
-            continue
-        row = row + [""] * (len(header) - len(row))  # pad short rows
-
-        kept = []
-        for cols in slots:
-            if row[cols["code"]].strip() == EMPTY_SUBJECT_MARKER:
-                removed += 1
-                continue
-            kept.append({f: row[i] for f, i in cols.items()})
-
-        for pos, cols in enumerate(slots):
-            values = kept[pos] if pos < len(kept) else {}
-            for f, i in cols.items():
-                row[i] = values.get(f, "")
-        rows[r] = row
-
-    if removed == 0:
-        return csv_bytes, 0
-
-    buf = io.StringIO()
-    csv.writer(buf, delimiter=delimiter, lineterminator="\n").writerows(rows)
-    out_enc = "utf-8" if enc == "utf-8-sig" else enc
-    return buf.getvalue().encode(out_enc), removed
 
 
 def inject_csv(template_text: str) -> str:
@@ -237,14 +150,8 @@ generate = st.button(
 
 if generate and uploaded is not None:
     with st.spinner(f"Compiling {card_type} admit cards…"):
-        csv_bytes, removed = drop_empty_subjects(uploaded.getvalue())
+        csv_bytes = uploaded.getvalue()
         pdf_bytes, log = build_pdf(card_type, csv_bytes)
-
-    if removed:
-        st.info(
-            f"Removed {removed} subject slot(s) with code `{EMPTY_SUBJECT_MARKER}` "
-            "before compiling."
-        )
 
     if pdf_bytes:
         out_name = f"AdmitCards_{card_type}.pdf"
@@ -280,7 +187,5 @@ requires letters only — no spaces or digits):
 - **Resit** prints only courses whose grade is `F`.
 - **Ex** prints only courses whose grade is `F` or `Z`.
 - Rows with an empty `roll` are skipped.
-- A course whose code is `--` is removed before compiling (code, subject and
-  grade), and the remaining courses move up.
 """
     )
