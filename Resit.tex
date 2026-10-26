@@ -80,6 +80,27 @@
 \csvreader[
   head to column names]{Ex_1st_sem_MTST24_S2026.csv}{}{%
   \ifthenelse{\equal{\roll}{}}{}{%
+  % --- PREPARE TABLE CONTENT ---
+  % Done first, so a student with no backlog can be skipped before anything is printed.
+  \setcounter{courseNo}{0} % Counts the failed courses found for this student
+  \def\tablebody{} % Clear the table body
+
+  % Rows are added only for Grade 'F' courses whose code is not "--"
+  \addcourserow{\gradeOne}{\codeOne}{\subOne}
+  \addcourserow{\gradeTwo}{\codeTwo}{\subTwo}
+  \addcourserow{\gradeThree}{\codeThree}{\subThree}
+  \addcourserow{\gradeFour}{\codeFour}{\subFour}
+  \addcourserow{\gradeFive}{\codeFive}{\subFive}
+  \addcourserow{\gradeSix}{\codeSix}{\subSix}
+  \addcourserow{\gradeSeven}{\codeSeven}{\subSeven}
+  \addcourserow{\gradeEight}{\codeEight}{\subEight}
+  \addcourserow{\gradeNine}{\codeNine}{\subNine}
+  \addcourserow{\gradeTen}{\codeTen}{\subTen}
+  \addcourserow{\gradeEleven}{\codeEleven}{\subEleven}
+
+  % No backlog (courseNo is still 0): generate no admit card for this student
+  \ifthenelse{\value{courseNo}=0}{}{%
+
   % ---------- Background ----------
   \AddToShipoutPicture*{
     \put(0,0){
@@ -122,26 +143,6 @@
   \centering
   \renewcommand{\arraystretch}{1.2}
   
-  % --- PREPARE TABLE CONTENT ---
-  \setcounter{courseNo}{0} % Used here to check if ANY courses are failed/absent
-  \def\tablebody{} % Clear the table body
-  
-  % Updated logic to check for Grade 'F' only
-  \addcourserow{\gradeOne}{\codeOne}{\subOne}
-  \addcourserow{\gradeTwo}{\codeTwo}{\subTwo}
-  \addcourserow{\gradeThree}{\codeThree}{\subThree}
-  \addcourserow{\gradeFour}{\codeFour}{\subFour}
-  \addcourserow{\gradeFive}{\codeFive}{\subFive}
-  \addcourserow{\gradeSix}{\codeSix}{\subSix}
-  \addcourserow{\gradeSeven}{\codeSeven}{\subSeven}
-  \addcourserow{\gradeEight}{\codeEight}{\subEight}
-  \addcourserow{\gradeNine}{\codeNine}{\subNine}
-  \addcourserow{\gradeTen}{\codeTen}{\subTen}
-  \addcourserow{\gradeEleven}{\codeEleven}{\subEleven}
-  
-  % If no courses failed (courseNo is still 0), append the "No failed courses" row
-  \ifthenelse{\value{courseNo}=0}{\appto\tablebody{- & - & No failed subjects\\}}{}
-
   % RESET counter BEFORE drawing the table so it counts 1, 2, 3... properly inside the table
   \setcounter{courseNo}{0} 
 
@@ -160,6 +161,7 @@
     \small\textbf{Controller of Examination}\\
   \end{flushright}
   \clearpage
+  }% end backlog check
   }% end non-empty roll check
 } % end csvreader
 
