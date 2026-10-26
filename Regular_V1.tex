@@ -27,6 +27,16 @@
 
 % Define Course Number Counter
 \newcounter{courseNo}
+
+% Append one numbered row for a course slot to \tablebody.
+% If the course code is "--" (or empty) nothing is added, so the row and its
+% serial number never appear and the numbering stays 1, 2, 3, ...
+%   #1 = course code, #2 = course name
+\newcommand{\addcourserow}[2]{%
+  \ifthenelse{\equal{#1}{--}\OR\equal{#1}{}}{}{%
+    \appto\tablebody{\stepcounter{courseNo}\thecourseNo{.}  & \justifying#1 & #2\\}%
+  }%
+}
 \hfuzz=30pt
 \hbadness=10000
 
@@ -85,33 +95,26 @@
     \renewcommand{\arraystretch}{1.2}
     \setcounter{courseNo}{0}
 
-    \IfStrEq{\codeEleven}{--}{%
-    \def\CourseElevenRow{}%
-    }{%
-    \def\CourseElevenRow{\stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeEleven & \subEleven\\}%
-    }
-
-     \IfStrEq{\codeTen}{--}{%
-    \def\CourseTenRow{}%
-    }{%
-    \def\CourseTenRow{\stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeTen & \subTen\\}%
-    }
+    % --- PREPARE TABLE CONTENT ---
+    % Rows are only added for courses whose code is not "--" (or empty).
+    \def\tablebody{}
+    \addcourserow{\codeOne}{\subOne}
+    \addcourserow{\codeTwo}{\subTwo}
+    \addcourserow{\codeThree}{\subThree}
+    \addcourserow{\codeFour}{\subFour}
+    \addcourserow{\codeFive}{\subFive}
+    \addcourserow{\codeSix}{\subSix}
+    \addcourserow{\codeSeven}{\subSeven}
+    \addcourserow{\codeEight}{\subEight}
+    \addcourserow{\codeNine}{\subNine}
+    \addcourserow{\codeTen}{\subTen}
+    \addcourserow{\codeEleven}{\subEleven}
 
     \begin{tabular}{|>{\centering\arraybackslash}p{1cm}|>{\centering\arraybackslash}p{3.5cm}|p{11cm}|}
       \hline
       \textbf{S.No} & \textbf{Course Code} & \textbf{Course Name} \\
       \hline
-      \stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeOne & \subOne\\
-      \stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeTwo & \subTwo\\
-      \stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeThree & \subThree\\
-      \stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeFour & \subFour\\
-      \stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeFive & \subFive\\
-      \stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeSix & \subSix\\
-      \stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeSeven & \subSeven\\
-      \stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeEight & \subEight\\
-      \stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeNine & \subNine\\
-      \CourseTen\\
-      \CourseElevenRow
+      \tablebody
       \hline
     \end{tabular}
 
