@@ -108,7 +108,8 @@ def build_pdf(card_type: str, csv_bytes: bytes) -> tuple[bytes | None, str]:
             log = proc.stdout + "\n" + proc.stderr
 
         pdf_path = os.path.join(work, "main.pdf")
-        if os.path.exists(pdf_path):
+        # LaTeX leaves a 0-byte main.pdf when every row was skipped ("No pages of output")
+        if os.path.exists(pdf_path) and os.path.getsize(pdf_path) > 0:
             with open(pdf_path, "rb") as fh:
                 return fh.read(), log
         return None, log
@@ -163,6 +164,18 @@ if generate and uploaded is not None:
             mime="application/pdf",
             type="primary",
         )
+    elif "No pages of output" in log:
+        # LaTeX produced nothing because every row was skipped
+        if card_type == "Regular":
+            st.warning(
+                "No admit cards were generated: the CSV has no rows with a roll number."
+            )
+        else:
+            grades = "F" if card_type == "Resit" else "F or Z"
+            st.warning(
+                f"No admit cards were generated: no student in this CSV has a "
+                f"backlog course (grade {grades}) for the {card_type} exam."
+            )
     else:
         st.error("PDF generation failed. See the LaTeX log below.")
 
@@ -186,6 +199,8 @@ requires letters only — no spaces or digits):
 - **Regular** prints every course.
 - **Resit** prints only courses whose grade is `F`.
 - **Ex** prints only courses whose grade is `F` or `Z`.
+- **Resit / Ex:** a student with no such course gets no admit card (and no serial number).
+- A course whose code is `--` (or empty) is never printed; the rest are renumbered 1, 2, 3…
 - Rows with an empty `roll` are skipped.
 """
     )
