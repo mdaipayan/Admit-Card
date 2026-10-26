@@ -91,6 +91,12 @@
     \def\CourseElevenRow{\stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeEleven & \subEleven\\}%
     }
 
+     \IfStrEq{\codeTen}{--}{%
+    \def\CourseTenRow{}%
+    }{%
+    \def\CourseTenRow{\stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeTen & \subTen\\}%
+    }
+
     \begin{tabular}{|>{\centering\arraybackslash}p{1cm}|>{\centering\arraybackslash}p{3.5cm}|p{11cm}|}
       \hline
       \textbf{S.No} & \textbf{Course Code} & \textbf{Course Name} \\
@@ -104,7 +110,7 @@
       \stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeSeven & \subSeven\\
       \stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeEight & \subEight\\
       \stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeNine & \subNine\\
-      \stepcounter{courseNo}\thecourseNo{.}  & \justifying\codeTen & \subTen\\
+      \CourseTen\\
       \CourseElevenRow
       \hline
     \end{tabular}
